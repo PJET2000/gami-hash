@@ -1,0 +1,73 @@
+#!/bin/bash
+# Fake zenity: logs every invocation and answers according to $SHIM_SCENARIO.
+# Mimics real zenity conventions: exit 0 = OK, exit 1 = cancel,
+# extra button = its label on stdout + exit 1, file dialogs print the path.
+LOG="${SHIM_LOG:?}"
+STATE="${SHIM_STATE:?}"
+echo "ARGS: $*" >> "$LOG"
+
+kind=""
+for a in "$@"; do
+  case "$a" in
+    --question) kind=question;;
+    --info) kind=info;;
+    --warning) kind=warning;;
+    --error) kind=error;;
+    --progress) kind=progress;;
+    --file-selection) kind=file;;
+  esac
+done
+has() { for a in "$@"; do [ "$a" = "$1" ] && return 0; done; return 1; }
+save=0; dir=0
+for a in "$@"; do
+  [ "$a" = "--save" ] && save=1
+  [ "$a" = "--directory" ] && dir=1
+done
+
+count_key="$kind$save$dir"
+n=$(grep -c "^$count_key$" "$STATE" 2>/dev/null)
+[ -z "$n" ] && n=0
+echo "$count_key" >> "$STATE"
+
+is_done_dialog=0
+for a in "$@"; do
+  case "$a" in *Fertig.*|*Done.*) is_done_dialog=1;; esac
+done
+
+case "$kind" in
+  question)
+    # The done dialog offers "Ordner öffnen" — always answer "Schließen"
+    # in tests so no real file manager is launched.
+    [ "$is_done_dialog" = 1 ] && exit 1
+    case "$SHIM_SCENARIO" in
+      welcome-cancel) exit 1;;
+      *) exit 0;; # OK everywhere (on resume questions OK = continue)
+    esac;;
+  file)
+    if [ "$dir" = 1 ]; then
+      echo "$SHIM_ROOT"; exit 0
+    fi
+    if [ "$save" = 1 ]; then
+      if [ "$SHIM_SCENARIO" = "inside-root-first" ] && [ "$n" = 0 ]; then
+        echo "$SHIM_ROOT/boese.csv"; exit 0
+      fi
+      echo "$SHIM_OUTPUT"; exit 0
+    fi
+    exit 1;;
+  progress)
+    lines=0
+    while IFS= read -r line; do
+      echo "PROGRESS: $line" >> "$LOG"
+      lines=$((lines+1))
+      if [ "$SHIM_SCENARIO" = "cancel-progress" ] && [ $lines -ge 1 ]; then
+        echo "PROGRESS: (cancel pressed)" >> "$LOG"
+        exit 1
+      fi
+    done
+    exit 0;;
+  info|warning|error)
+    exit 0;;
+  *)
+    # --version probe or unknown: behave like zenity 4
+    echo "4.0.0"; exit 0;;
+esac

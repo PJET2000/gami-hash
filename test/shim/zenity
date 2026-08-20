@@ -31,7 +31,7 @@ echo "$count_key" >> "$STATE"
 
 is_done_dialog=0
 for a in "$@"; do
-  case "$a" in *Fertig.*|*Done.*) is_done_dialog=1;; esac
+  case "$a" in *Done.*) is_done_dialog=1;; esac
 done
 
 case "$kind" in

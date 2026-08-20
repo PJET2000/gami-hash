@@ -22,34 +22,39 @@ build() { # GOOS GOARCH output [extra ldflags]
   GOOS="$1" GOARCH="$2" go build -ldflags "$LDFLAGS_COMMON ${4:-}" -o "dist/$3" .
 }
 
+# Download names are for people, not for build systems: the Windows file the
+# archivist sees is "GAMI-Hashing-Tool-1.2.0.exe", not a platform triple.
+VERNUM="${VERSION#v}"
+
+# Archives carry the commit date as file timestamp: deterministic for anyone
+# who checks out the same tag (reproducibility), and a date that makes sense
+# to the person extracting the file (not some fixed epoch).
+STAMP="$(git log -1 --format=%ci 2>/dev/null || echo "2026-01-01 00:00:00 +0000")"
+
 echo "building gami-hash $VERSION"
 # -H=windowsgui: double-click opens no console window (CLI still works from
 # cmd/PowerShell; output is re-attached to the parent console).
-build windows amd64 "gami-hash-$VERSION-windows-amd64.exe" "-H=windowsgui"
-build windows arm64 "gami-hash-$VERSION-windows-arm64.exe" "-H=windowsgui"
-build linux   amd64 "gami-hash-$VERSION-linux-amd64"
-build linux   arm64 "gami-hash-$VERSION-linux-arm64"
-build darwin  amd64 "gami-hash-$VERSION-macos-intel"
-build darwin  arm64 "gami-hash-$VERSION-macos-applesilicon"
+build windows amd64 "GAMI-Hashing-Tool-$VERNUM.exe" "-H=windowsgui"
+build windows arm64 "GAMI-Hashing-Tool-$VERNUM-windows-arm64.exe" "-H=windowsgui"
 
 # Linux and macOS downloads ship as archives: browsers strip the executable
-# permission from bare binaries, archives preserve it. Fixed timestamps and
-# ordering keep the archives reproducible too. Windows .exe works as-is.
-STAMP="2026-01-01 00:00:00 UTC"
-package() { # file
-  case "$1" in
-    *linux*)
-      tar --sort=name --owner=0 --group=0 --numeric-owner \
-          --mtime="$STAMP" -C dist -cf - "$1" | gzip -n > "dist/$1.tar.gz"
-      rm "dist/$1"
-      ;;
-    *macos*)
-      (cd dist && touch -d "$STAMP" "$1" && zip -X -q "$1.zip" "$1")
-      rm "dist/$1"
-      ;;
-  esac
+# permission from bare binaries, archives preserve it. Inside is one cleanly
+# named program file without version clutter.
+pack_linux() { # GOARCH archive-name
+  build linux "$1" "gami-hash"
+  tar --sort=name --owner=0 --group=0 --numeric-owner \
+      --mtime="$STAMP" -C dist -cf - "gami-hash" | gzip -n > "dist/$2"
+  rm dist/gami-hash
 }
-for f in dist/gami-hash-*; do package "$(basename "$f")"; done
+pack_macos() { # GOARCH archive-name
+  build darwin "$1" "GAMI-Hashing-Tool"
+  (cd dist && touch -d "$STAMP" "GAMI-Hashing-Tool" && zip -X -q "$2" "GAMI-Hashing-Tool")
+  rm dist/GAMI-Hashing-Tool
+}
+pack_linux amd64 "GAMI-Hashing-Tool-$VERNUM-linux.tar.gz"
+pack_linux arm64 "GAMI-Hashing-Tool-$VERNUM-linux-arm64.tar.gz"
+pack_macos arm64 "GAMI-Hashing-Tool-$VERNUM-macos.zip"
+pack_macos amd64 "GAMI-Hashing-Tool-$VERNUM-macos-intel.zip"
 
 (cd dist && sha256sum -- * > "SHA256SUMS-$VERSION.txt")
 echo

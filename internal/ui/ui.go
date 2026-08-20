@@ -30,6 +30,25 @@ func Run(t i18n.T, workers int, today string) int {
 		return 1
 	}
 
+	// An interrupted run resumes with one click, before any other dialog.
+	// This is the calm path after a cancel, crash or shutdown: no folder
+	// picking, no save dialog, no "replace file?" prompt from the system.
+	if lr, st, ok := resumableLastRun(); ok {
+		err := zenity.Question(t.ResumeLastRun(lr.Root, lr.Output, t.FormatInt(st.RowCount)),
+			zenity.Title(t.AppTitle()),
+			zenity.OKLabel(t.ResumeBtn()),
+			zenity.ExtraButton(t.NewRunBtn()),
+			zenity.CancelLabel(t.QuitBtn()))
+		switch {
+		case err == nil:
+			return finishRun(t, engine.Options{Root: lr.Root, Output: lr.Output, Workers: workers})
+		case errors.Is(err, zenity.ErrExtraButton):
+			// fall through to the normal wizard
+		default:
+			return 0
+		}
+	}
+
 	// Step 0: what this program does (and a chance to bail out).
 	err := zenity.Question(t.WelcomeText(engine.Version),
 		zenity.Title(t.AppTitle()),
@@ -62,18 +81,28 @@ func Run(t i18n.T, workers int, today string) int {
 		return 0
 	}
 
-	// Step 4: progress.
+	// Steps 4 and 5: progress and done message.
+	return finishRun(t, opts)
+}
+
+// finishRun executes the engine with the progress dialog and shows the
+// closing message. It also maintains the last-run state so an interrupted
+// run can be resumed with one click on the next start.
+func finishRun(t i18n.T, opts engine.Options) int {
+	saveLastRun(opts.Root, opts.Output)
+
 	res, runErr := runWithProgress(t, opts)
 	if runErr != nil {
 		zenity.Error(t.FatalError(runErr), zenity.Title(t.AppTitle()))
 		return 1
 	}
 
-	// Step 5: done message.
 	if res.Canceled {
 		zenity.Info(t.CanceledText(opts.Output), zenity.Title(t.AppTitle()))
 		return 0
 	}
+	clearLastRun()
+
 	msg := t.DoneText(
 		t.FormatInt(res.FilesHashed+res.FilesResumed),
 		t.FormatSize(res.BytesTotal),
@@ -84,7 +113,7 @@ func Run(t i18n.T, workers int, today string) int {
 		msg += t.DoneWithErrors(t.FormatInt(res.FilesFailed), engine.ErrorLogPath(res.Output))
 	}
 	// "Open folder" saves the inevitable "where is my file now?" question.
-	err = zenity.Question(msg,
+	err := zenity.Question(msg,
 		zenity.Title(t.AppTitle()),
 		zenity.OKLabel(t.OpenFolderBtn()),
 		zenity.CancelLabel(t.CloseBtn()))
@@ -138,7 +167,7 @@ func pickOutput(t i18n.T, root, today string) (engine.Options, bool) {
 		st := engine.CheckResume(output)
 		switch {
 		case st.Resumable && engine.SameRoot(st.Root, root):
-			err := zenity.Question(t.ResumeFound(t.FormatInt(st.RowCount), today),
+			err := zenity.Question(t.ResumeFound(t.FormatInt(st.RowCount)),
 				zenity.Title(t.AppTitle()),
 				zenity.OKLabel(t.ResumeBtn()),
 				zenity.ExtraButton(t.RestartBtn()),

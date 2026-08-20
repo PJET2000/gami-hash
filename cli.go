@@ -65,7 +65,7 @@ Flags:
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
 
-	t := i18n.T{Lang: i18n.EN}
+	t := i18n.T{}
 	eta := ui.NewETA()
 	var lastLine int
 	printProgress := func(p engine.Progress) {

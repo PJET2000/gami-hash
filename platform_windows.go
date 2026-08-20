@@ -23,13 +23,3 @@ func attachConsole() {
 		os.Stderr = f
 	}
 }
-
-// osUILanguage returns the Windows display-language tag (e.g. "de-DE") so
-// the GUI matches the user's system language.
-func osUILanguage() string {
-	langs, err := windows.GetUserPreferredUILanguages(windows.MUI_LANGUAGE_NAME)
-	if err != nil || len(langs) == 0 {
-		return ""
-	}
-	return langs[0]
-}

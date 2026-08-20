@@ -32,6 +32,25 @@ build linux   arm64 "gami-hash-$VERSION-linux-arm64"
 build darwin  amd64 "gami-hash-$VERSION-macos-intel"
 build darwin  arm64 "gami-hash-$VERSION-macos-applesilicon"
 
+# Linux and macOS downloads ship as archives: browsers strip the executable
+# permission from bare binaries, archives preserve it. Fixed timestamps and
+# ordering keep the archives reproducible too. Windows .exe works as-is.
+STAMP="2026-01-01 00:00:00 UTC"
+package() { # file
+  case "$1" in
+    *linux*)
+      tar --sort=name --owner=0 --group=0 --numeric-owner \
+          --mtime="$STAMP" -C dist -cf - "$1" | gzip -n > "dist/$1.tar.gz"
+      rm "dist/$1"
+      ;;
+    *macos*)
+      (cd dist && touch -d "$STAMP" "$1" && zip -X -q "$1.zip" "$1")
+      rm "dist/$1"
+      ;;
+  esac
+}
+for f in dist/gami-hash-*; do package "$(basename "$f")"; done
+
 (cd dist && sha256sum -- * > "SHA256SUMS-$VERSION.txt")
 echo
 echo "published hashes (give these to institutions):"

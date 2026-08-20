@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GAMI — Download the Hashing Tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;650&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* Tokens: identical to the institution portal. Single-theme pure white. */
+  :root {
+    --bg: #FFFFFF;
+    --surface-2: #FAFBFC;
+    --ink: #152035;
+    --ink-soft: #475569;
+    --ink-faint: #64748B;
+    --ink-faintest: #94A3B8;
+    --rule: #ECEFF3;
+    --rule-soft: #F4F6F9;
+    --green: #2D6A4F;
+    --green-deep: #1F5D3A;
+    --green-bg: #E7F0EB;
+    --green-faint: #F5F8F6;
+    --amber-touch: #B45309;
+    --amber-strong: #78350F;
+    --amber-bg: #FEF7E6;
+    --amber-border: #F3E0B6;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 15.5px;
+    line-height: 1.65;
+    font-weight: 400;
+  }
+  .page { max-width: 680px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* Header, same quiet strip as the portal */
+  header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 22px 0 20px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 52px;
+  }
+  header img { width: 30px; height: 30px; }
+  .wordmark { font-weight: 650; font-size: 16px; letter-spacing: 0.01em; }
+  .wordmark span { color: var(--ink-faint); font-weight: 450; }
+
+  .eyebrow {
+    font-size: 11.5px; font-weight: 600; letter-spacing: 0.09em;
+    text-transform: uppercase; color: var(--green);
+    margin-bottom: 14px;
+  }
+  h1 {
+    font-size: 29px; font-weight: 650; line-height: 1.25;
+    letter-spacing: -0.015em; text-wrap: balance;
+    margin-bottom: 14px;
+  }
+  .lede { color: var(--ink-soft); max-width: 58ch; margin-bottom: 34px; }
+
+  /* Download block */
+  .dl-card {
+    border: 1px solid var(--rule);
+    border-radius: 14px;
+    padding: 26px 26px 22px;
+    margin-bottom: 16px;
+  }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: inherit; font-size: 14.5px; font-weight: 550;
+    color: var(--ink); background: var(--bg);
+    border: 1.5px solid var(--ink); border-radius: 99px;
+    padding: 11px 26px; cursor: pointer; text-decoration: none;
+    transition: all 0.15s;
+  }
+  .btn-primary:hover, .btn-primary:focus-visible {
+    background: var(--ink); color: #fff;
+    box-shadow: 0 4px 12px rgba(15, 27, 45, 0.12);
+  }
+  .btn-primary:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+  .btn-primary svg { width: 15px; height: 15px; }
+  .dl-meta {
+    font-size: 12.5px; color: var(--ink-faint); margin-top: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  .dl-others { font-size: 13px; color: var(--ink-faint); margin: 4px 2px 40px; }
+  .dl-others a { color: var(--ink-soft); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--rule); }
+  .dl-others a:hover { color: var(--green-deep); text-decoration-color: var(--green); }
+
+  .facts { list-style: none; display: grid; gap: 9px; margin: 22px 0 0; }
+  .facts li { display: flex; gap: 10px; align-items: baseline; color: var(--ink-soft); font-size: 14px; }
+  .facts .tick { color: var(--green); font-weight: 650; flex: none; }
+
+  /* Steps: a real sequence, so numbers carry meaning */
+  section { margin-bottom: 48px; }
+  h2 {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.09em;
+    text-transform: uppercase; color: var(--ink-faint);
+    padding-bottom: 10px; border-bottom: 1px solid var(--rule);
+    margin-bottom: 22px;
+  }
+  .steps { list-style: none; display: grid; gap: 20px; }
+  .steps li { display: grid; grid-template-columns: 34px 1fr; gap: 16px; }
+  .step-no {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--green-bg); color: var(--green-deep);
+    font-size: 13px; font-weight: 650;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 1px; font-variant-numeric: tabular-nums;
+  }
+  .steps b { font-weight: 600; }
+  .steps p { color: var(--ink-soft); font-size: 14.5px; margin-top: 2px; }
+  .steps .quote {
+    font-size: 13px; color: var(--ink-faint);
+    border-left: 2px solid var(--green-bg); padding-left: 10px; margin-top: 7px;
+  }
+
+  /* SmartScreen guidance: amber, like the portal's touch prompts */
+  .warncard {
+    background: var(--amber-bg); border: 1px solid var(--amber-border);
+    border-radius: 12px; padding: 20px 22px; margin-top: 18px;
+  }
+  .warncard h3 { font-size: 14px; font-weight: 650; color: var(--amber-strong); margin-bottom: 6px; }
+  .warncard p { font-size: 14px; color: var(--amber-strong); }
+  .warncard .clicks { margin-top: 10px; font-size: 14px; color: var(--amber-strong); }
+  .warncard .clicks b {
+    display: inline-block; background: #fff; border: 1px solid var(--amber-border);
+    border-radius: 6px; padding: 1px 9px; font-weight: 600;
+  }
+
+  /* IT / verification */
+  details {
+    border: 1px solid var(--rule); border-radius: 12px;
+    padding: 0; overflow: hidden;
+  }
+  summary {
+    cursor: pointer; padding: 15px 20px;
+    font-size: 14px; font-weight: 600; color: var(--ink-soft);
+    list-style: none; display: flex; align-items: center; gap: 10px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary .chev { transition: transform 0.15s; color: var(--ink-faintest); }
+  details[open] summary .chev { transform: rotate(90deg); }
+  summary:hover { background: var(--surface-2); }
+  .it-body { padding: 4px 20px 20px; border-top: 1px solid var(--rule-soft); }
+  .it-body p { font-size: 14px; color: var(--ink-soft); margin: 12px 0; }
+  .it-body a { color: var(--green-deep); }
+  .it-body code { font-family: var(--mono); font-size: 12px; }
+  .hashes {
+    background: var(--surface-2); border: 1px solid var(--rule);
+    border-radius: 8px; padding: 14px 16px;
+    font-family: var(--mono); font-size: 11px; line-height: 1.9;
+    color: var(--ink-soft); overflow-x: auto; white-space: pre;
+  }
+
+  footer {
+    margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--rule);
+    font-size: 12.5px; color: var(--ink-faintest);
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+  footer a { color: var(--ink-faint); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhLS0gQ3JlYXRlZCB3aXRoIElua3NjYXBlIChodHRwOi8vd3d3Lmlua3NjYXBlLm9yZy8pIC0tPgoKPHN2ZwogICB3aWR0aD0iNTEuNTI3NTk5bW0iCiAgIGhlaWdodD0iNTIuNDQ1MTZtbSIKICAgdmlld0JveD0iMCAwIDUxLjUyNzYgNTIuNDQ1MTYiCiAgIHZlcnNpb249IjEuMSIKICAgaWQ9InN2ZzEiCiAgIHhtbDpzcGFjZT0icHJlc2VydmUiCiAgIGlua3NjYXBlOnZlcnNpb249IjEuNC4zICgwZDE1Zjc1MDQyLCAyMDI1LTEyLTI1KSIKICAgc29kaXBvZGk6ZG9jbmFtZT0iR0FNSS1MT0dPLUljb24uc3ZnIgogICBpbmtzY2FwZTpleHBvcnQtZmlsZW5hbWU9IkdBTUktTE9HTy5zdmciCiAgIGlua3NjYXBlOmV4cG9ydC14ZHBpPSI5NiIKICAgaW5rc2NhcGU6ZXhwb3J0LXlkcGk9Ijk2IgogICB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSIKICAgeG1sbnM6c29kaXBvZGk9Imh0dHA6Ly9zb2RpcG9kaS5zb3VyY2Vmb3JnZS5uZXQvRFREL3NvZGlwb2RpLTAuZHRkIgogICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxzb2RpcG9kaTpuYW1lZHZpZXcKICAgICBpZD0ibmFtZWR2aWV3MSIKICAgICBwYWdlY29sb3I9IiNmZmZmZmYiCiAgICAgYm9yZGVyY29sb3I9IiM2NjY2NjYiCiAgICAgYm9yZGVyb3BhY2l0eT0iMS4wIgogICAgIGlua3NjYXBlOnNob3dwYWdlc2hhZG93PSIyIgogICAgIGlua3NjYXBlOnBhZ2VvcGFjaXR5PSIwLjAiCiAgICAgaW5rc2NhcGU6cGFnZWNoZWNrZXJib2FyZD0iMCIKICAgICBpbmtzY2FwZTpkZXNrY29sb3I9IiNkMWQxZDEiCiAgICAgaW5rc2NhcGU6ZG9jdW1lbnQtdW5pdHM9Im1tIgogICAgIGlua3NjYXBlOnpvb209IjAuNjQxMjU0IgogICAgIGlua3NjYXBlOmN4PSIzMzIuMTYxNjciCiAgICAgaW5rc2NhcGU6Y3k9Ii03My4yOTM4OSIKICAgICBpbmtzY2FwZTp3aW5kb3ctd2lkdGg9IjE1MzYiCiAgICAgaW5rc2NhcGU6d2luZG93LWhlaWdodD0iOTIzIgogICAgIGlua3NjYXBlOndpbmRvdy14PSIwIgogICAgIGlua3NjYXBlOndpbmRvdy15PSIwIgogICAgIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjEiCiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0ibGF5ZXIxIiAvPjxkZWZzCiAgICAgaWQ9ImRlZnMxIiAvPjxnCiAgICAgaW5rc2NhcGU6bGFiZWw9IkxheWVyIDEiCiAgICAgaW5rc2NhcGU6Z3JvdXBtb2RlPSJsYXllciIKICAgICBpZD0ibGF5ZXIxIgogICAgIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0xNy4xMTk2ODQsLTMzLjc1MzgyNSkiPjxwYXRoCiAgICAgICBzdHlsZT0iZmlsbDojMGUxMTBkO2ZpbGwtb3BhY2l0eToxO3N0cm9rZS13aWR0aDowLjEzMzcxOSIKICAgICAgIGQ9Im0gMzAuOTU5Mzg5LDg2LjEwMjQ3OSBjIC0yLjcwMzcyMywtMC40NTI1OTIgLTUuMjM3MzU0LC0yLjU3MTkyOCAtNS45NjA0MTQsLTQuOTg1Nzc4IC0wLjIzNzk2NywtMC43OTQ0MzYgLTAuMjUxMDk4LC0wLjgwODg4IC0wLjk4NDgxNiwtMS4wODMwMDcgLTMuMjM3NzcsLTEuMjA5Njc5IC01LjM4ODMwOSwtNS4wMTkwNTIgLTQuNTQ1OTMyLC04LjA1MjQ5NyAwLjEzNzI5LC0wLjQ5NDM4MyAwLjEyNDM3MiwtMC41MjU1NzEgLTAuNTAyMTk2LC0xLjIxMjI0NyAtMi42NjQ4NTEsLTIuOTIwNTE3IC0yLjQxOTkzLC03LjM0NzY5NyAwLjU3MTk4NCwtMTAuMzM4NzE5IGwgMS4wOTM3NTYsLTEuMDkzNDMzIC0wLjMxODAxMSwtMC42NDQ5MjEgYyAtMS4zNzIxMzMsLTIuNzgyNzE3IC0wLjA5MjYxLC02LjQwMDQ3NCAyLjgwNzkxNywtNy45MzkyMDIgMC41Nzc2MjcsLTAuMzA2NDI2IDAuNjE2ODc0LC0wLjM2MTY0IDAuNjE2ODc0LC0wLjg2NzY5MyAwLC0zLjQ2NTE3OSAyLjk4ODc5OCwtNi40OTAzOCA3LjA3OTc3OCwtNy4xNjU5ODggMC44NTE3NzgsLTAuMTQwNjY3IDEuMDQ3NzAzLC0wLjIyNjExNCAxLjM3NjEwNCwtMC42MDAxNDIgMS4xODUwMDcsLTEuMzQ5NjU0IDMuOTU0Nzg3LC0yLjE5OTM4IDUuMzkwMTk2LC0xLjY1MzYzOSAwLjQxMzg3NCwwLjE1NzM1NSAwLjQxMDQyNCwwLjIzNTAyNCAtMC4wODU5NCwxLjkzNjYgLTAuMzExNjg2LDEuMDY4NDg3IC0wLjMxMjExNCwxLjA4MDg2NCAtMC4zNTY4MDMsMTAuNDYzNTI3IGwgLTAuMDQ0NzQsOS4zOTM3NzYgaCAtMi41MTI3NDUgYyAtNC4wNjE5MzYsMCAtNC44ODk2MDQsLTAuNDc4NzUxIC01LjQzMjYxMSwtMy4xNDI0MDMgLTAuNDM1MjI5LC0yLjEzNTAwOCAtMi4zNzYyMTcsLTQuMjMxMTIgLTMuMzkyMzY0LC0zLjY2MzQ3IC0wLjY3Njk5MywwLjM3ODE5MiAtMC41NjA4NDUsMS4wMzM2MzUgMC4zMTU4ODYsMS43ODI2NTEgMC44NzIzOTcsMC43NDUzMTEgMS4wNjkzNTMsMS4wODMyNjkgMS4zNDYyNzEsMi4zMTAxMTcgMC44MDMzMDUsMy41NTg4NTQgMi4yMDg0ODEsNC40NTEzMDYgNy4wMDkxNzUsNC40NTE2MzUgbCAyLjYxMjg2LDEuMzZlLTQgdiAxMC4zMzQ5OSBjIDAsMTEuNDU2OTUzIDAuMDUxNjMsMTAuNzg0MTQgLTAuODYzOCwxMS4yNTc1MjQgLTAuOTU3NzksMC40OTUyOTIgLTMuNzA4ODA5LDAuNzY1MTczIC01LjIyMDQyNSwwLjUxMjEzNyB6IG0gMi43NzgzNTEsLTMuMDU3NjAzIGMgMC41MjU4NjUsLTAuMzY4MzI3IDAuNDA4NTgsLTEuMDQ2NjY5IC0wLjI2NTM3OSwtMS41MzQ4ODEgLTAuNjk1NjYxLC0wLjUwMzkzIC0wLjk4NzQ3NiwtMC45MzA1NjUgLTEuMjU0NzI3LC0xLjgzNDM4OSAtMC40MzI5MTYsLTEuNDY0MDUgLTEuOTI3ODcxLC0xLjI1NzM4OCAtMS43NTAyOTIsMC4yNDE5NTggMC4yMzIyNTcsMS45NjEwNzIgMi4yMjA3MjksMy44NjI1MzYgMy4yNzAzOTgsMy4xMjczMTIgeiBNIDI5LjUxNDcsNzYuMjAzMjQxIGMgMS4wNzQzNjcsLTAuNTA0NDM1IDEuNjY5MzUxLC0xLjAwOTAzMiAxLjc3OTEyMSwtMS41MDg4NDMgMC4yNTE3NCwtMS4xNDYxMjYgLTAuODI5NTQxLC0xLjQ5ODYxNCAtMS44Mjg1MywtMC41OTYwODkgLTEuMDEzMTM3LDAuOTE1MzE3IC0yLjU0OTYyNSwwLjk3NTQ2NCAtMy40NTM1MTMsMC4xMzUxOTMgLTAuOTE0MzQ2LC0wLjg0OTk5NCAtMi4wODk0MywtMC4yMDQxMzQgLTEuNTQ0ODA1LDAuODQ5MDY1IDAuNzYxNDExLDEuNDcyMzg0IDMuMTYzMDM1LDIuMDA1NTg2IDUuMDQ3NzI3LDEuMTIwNjc0IHogbSA0LjM5ODY4MSwtNC43MDA0NjEgYyAwLjg5MTEzMSwtMC43MjE1ODkgLTAuMjAwMDg0LC0yLjYzNzY3IC0xLjk2NDAxNSwtMy40NDg2NjMgLTAuNTkzOTQxLC0wLjI3MzA3NCAtMC45Mjg5NzQsLTAuMzE5MTYxIC0yLjYwNzUyNSwtMC4zNTg2OTMgLTIuOTM3OTA1LC0wLjA2OTE5IC00LjI2NjA5OCwtMS4wODQyMzUgLTQuMjY2MDk4LC0zLjI2MDI4NyAwLC0wLjc2NzYgLTEuMDcxMzU5LC0xLjIzODM3NiAtMS42MDQ2MzEsLTAuNzA1MTA4IC0wLjMxODM4NSwwLjMxODM5NCAtMC4zMjQ3NjQsMC40NzU1MDYgLTAuMDY0MTMsMS41ODEwNjQgMC42OTg1ODksMi45NjMzMDEgMi4xMTYzMDcsNC4wMjk0MzggNS41NDY2MTksNC4xNzExMTUgMi41ODIxODYsMC4xMDY2NDQgMy4wMzU0NTQsMC4yOTg4MSAzLjUzNzE4MiwxLjQ5OTYyIDAuMzIzNjAxLDAuNzc0NDkzIDAuODY0NzYyLDAuOTcyNjU5IDEuNDIyNTk4LDAuNTIwOTUyIHogTSAzMy42MTYwNDIsNTYuNTk3MTQ1IGMgMC43MjA1NiwtMC41NzgzMjQgLTAuMzA2OTc5LC0zLjQ3OTczNCAtMS41NjI0OTUsLTQuNDEyMDAyIC0yLjEyNjIwMywtMS41Nzg3NyAtMi40MDUyMzUsLTIuMzg1NDk3IC0xLjMxMDkwMywtMy43OTAxMTggMS4wMTc2NTYsLTEuMzA2MjA5IC0wLjAyMDE4LC0yLjI3ODI0NyAtMS4yNDgwNTYsLTEuMTY4OTI5IC0xLjg3MDMwNCwxLjY4OTcwNCAtMS4zOTEzMjEsNC4zMjU3NjYgMS4wOTYxNjQsNi4wMzI3MyAwLjg3NTc1NCwwLjYwMDk1NSAxLjMzNjY4NCwxLjM0ODcxMyAxLjQxMDk5MiwyLjI4ODk1MSAwLjA5NTk4LDEuMjE0NzU5IDAuODIxMDIzLDEuNjg2MDYgMS42MTQyOTgsMS4wNDkzNjggeiBtIDUuNTY0MDg0LDI4LjczNzcwMyAtMC4zMzY5OTksLTAuMzM3MDEyIDAuMDQwMzQsLTIwLjc2MzEzNCBjIDAuMDQ0NDIsLTIyLjg1ODg2NyAtMC4wMTY2NywtMjEuMTc2ODYgMC44NDg5MywtMjMuMzcwNjYxIDMuODQwNjE3LC05LjczMzc1MyAxOC42OTkyODYsLTkuMzkxOTYzIDIyLjc4MDk4NywwLjUyNDAyNCAwLjgyMTIzNywxLjk5NTA5NSAwLjgzMzQwNywyLjA5MjAwNCAwLjkwMzIyMiw3LjE5NzUzNSAwLjAzNjg0LDIuNjkzNzM4IDAuMTE1MzMyLDQuNjgxNDMzIDAuMTgzMjA2LDQuNjM5NDg1IDEuMDY1NzY4LC0wLjY1ODY4MiAzLjgxNTUxOSwwLjk1NDY2NyA0LjY0NTc5MywyLjcyNTgwNiBsIDAuMzU1NzQ4LDAuNzU4ODc2IDAuMDQwMTgsNi44ODY1NDQgYyAwLjA3NzQ2LDEzLjI2OTY2IC0wLjU4MTE3NSwxNS45MTAxNjUgLTQuODE5MzM2LDE5LjMyMTI3NiAtMy4xOTU3MDYsMi41NzIwNzQgLTMuNjY5NTI1LDIuNjU3ODI1IC0xNC45NzgwMTcsMi43MTA2NzkgbCAtOS4zMjcwNjMsMC4wNDM2MiB6IG0gMTUuNTQwMTk2LC04LjcxOTg0MSBjIDAuMDQ2MzUsLTAuMTIwNzI0IC0wLjI2NjkyOSwtMS45MDY1NjkgLTAuNjk2MTMxLC0zLjk2ODUzOCBsIC0wLjc4MDM3MiwtMy43NDkwMjkgMC4zMjQyMTcsLTAuMjAzODUxIGMgNC42NjUwNzgsLTIuOTMzMjQ4IDAuNjEyMjM2LC0xMC4xNjgxMDMgLTQuNDIyODMzLC03Ljg5NTMyOSAtMy4xNTcyOTcsMS40MjUxNyAtMy4zNzM1MzUsNi4zNjU5MTggLTAuMzQ5MTEyLDcuOTc2ODY1IDAuMjQzMDM1LDAuMTI5NDUyIDAuMjI2NTA4LDAuMjY4NTMxIC0wLjQzNTE1LDMuNjYyMzg5IC0wLjY4MTI5OSwzLjQ5NDY1MyAtMC43NzAxNTcsNC4xMzUyMDEgLTAuNTk3NDk5LDQuMzA3ODU1IDAuMjIxNzIyLDAuMjIxNzE3IDYuODY5NTczLDAuMDk3MTUgNi45NTY4OCwtMC4xMzAzNjIgeiBtIDQuNTkxMTA0LC0yNy45MjI5MiBjIC0wLjAxMTUyLC01LjA2NTkyMyAtMC4wNzEwNSwtNS40NjE2OTMgLTEuMDQ4ODY3LC02Ljk2ODUxNSAtMy42NjAyODcsLTUuNjQwNDc3IC0xMi43MjQ0MjksLTQuODIxNTg0IC0xNS4wMjczODUsMS4zNTc2MjkgLTAuMjc5MzY1LDAuNzQ5NTc3IC0wLjI5NzU3NywxLjAzOTUzOCAtMC4zNDM4NDQsNS40NzE2OTUgbCAtMC4wNDg4Niw0LjY4MDE3NSA4LjIzOTU1MiwtMC4wMzEzOSA4LjIzOTUzOSwtMC4wMzEzOSB6IgogICAgICAgaWQ9InBhdGgxIgogICAgICAgc29kaXBvZGk6bm9kZXR5cGVzPSJzY3Nzc3Nzc3NzY3Nzc3NzY2Nzc2Njc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3NzY2Nzc3Nzc3Njc3NzY2Nzc2Nzc2Nzc3Nzc3NzY2Njc3NjY2NjIiAvPjwvZz48L3N2Zz4K" alt="GAMI">
+    <div class="wordmark">GAMI <span>· Tools for institutions</span></div>
+  </header>
+
+  <p class="eyebrow">Hashing Tool</p>
+  <h1>Create checksums of your collection, no technical knowledge needed</h1>
+  <p class="lede">
+    This small program creates a checksum list of the files in a folder you
+    choose, so GAMI can take over your collection safely. Your files are only
+    read and never leave your institution.
+  </p>
+
+  <div class="dl-card">
+    <a class="btn-primary" id="dl-btn" href="https://github.com/PJET2000/gami-hash/releases/download/v1.2.0/GAMI-Hashing-Tool-1.2.0.exe">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+        <path d="M8 2v8.5M4.5 7.5 8 11l3.5-3.5M2.5 13.5h11"/>
+      </svg>
+      <span id="dl-label">Download for Windows</span>
+    </a>
+    <div class="dl-meta">Version 1.2.0 · a single file, about 3&nbsp;MB · no installation, no admin rights</div>
+    <ul class="facts">
+      <li><span class="tick">✓</span> Only reads your files. Nothing is changed, moved or deleted.</li>
+      <li><span class="tick">✓</span> No internet use. No file contents leave your computer.</li>
+      <li><span class="tick">✓</span> Stop any time. The next start continues where you left off.</li>
+    </ul>
+  </div>
+  <p class="dl-others" id="dl-others">
+    Also available for
+    <a href="https://github.com/PJET2000/gami-hash/releases/download/v1.2.0/GAMI-Hashing-Tool-1.2.0-macos.zip">macOS</a> ·
+    <a href="https://github.com/PJET2000/gami-hash/releases/download/v1.2.0/GAMI-Hashing-Tool-1.2.0-linux.tar.gz">Linux</a> ·
+    <a href="https://github.com/PJET2000/gami-hash/releases/tag/v1.2.0">all variants</a><br>
+    On macOS and Linux: extract the archive with a double-click, then start the program inside.
+  </p>
+
+  <section>
+    <h2>How it works</h2>
+    <ol class="steps">
+      <li>
+        <div class="step-no">1</div>
+        <div>
+          <b>Download and double-click.</b>
+          <p>Easiest is to keep the file on your desktop. There is nothing to
+          install.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-no">2</div>
+        <div>
+          <b>Choose the folder.</b>
+          <p>The program asks which folder (or external drive) should be
+          recorded.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-no">3</div>
+        <div>
+          <b>Confirm where to save, then start.</b>
+          <p>The program suggests your desktop and a file name for the result.
+          Just click Save, then Start.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-no">4</div>
+        <div>
+          <b>Wait, or simply keep working.</b>
+          <p>A progress bar shows the remaining time. Large collections can
+          take hours. You can keep using the computer, or click Cancel and
+          continue another day: the next start picks up right where it
+          stopped.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-no">5</div>
+        <div>
+          <b>Send the result file to GAMI.</b>
+          <p>At the end the program offers to open the folder for you. Send
+          the CSV file (file names and checksums only, no file contents) to
+          your GAMI contact as agreed.</p>
+          <p class="quote">A step-by-step guide with pictures comes with our
+          email.</p>
+        </div>
+      </li>
+    </ol>
+
+    <div class="warncard">
+      <h3>Windows shows a blue message on first start?</h3>
+      <p>"Windows protected your PC" is a standard message for software from
+      small publishers, not a sign of a problem. Your IT can check the
+      authenticity of the file at any time (see below).</p>
+      <p class="clicks">Click <b>More info</b>, then <b>Run anyway</b>.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>For your IT department</h2>
+    <details>
+      <summary><span class="chev">›</span> Transparency &amp; verification: source code, checksums, reproducible builds</summary>
+      <div class="it-body">
+        <p>The program is open source and contains no networking code at all.
+        You can check this in the <a href="https://github.com/PJET2000/gami-hash">source code on GitHub</a>
+        or with any firewall. It only reads the chosen folder; the only thing
+        it writes is the result file at the chosen location. A one-page
+        overview ships with the software
+        (<code>WHAT-THIS-TOOL-DOES.md</code>).</p>
+        <p>SHA-256 checksums for version 1.2.0, comparable with
+        <code>Get-FileHash</code> (PowerShell) or <code>sha256sum</code>:</p>
+<div class="hashes">d71b4a8c68b77baae3921c1cdd74b3a98af88b1bbb11047d9ca21f88be7acfdd  GAMI-Hashing-Tool-1.2.0.exe
+0be56c55d704f3d93cbc7de63deaaedebc0d99b3d9d67cd09a1d5c7b855735f0  GAMI-Hashing-Tool-1.2.0-windows-arm64.exe
+61e7013ed103290be9c831644a76886eed741f250af614773c5f1da26bdb25bc  GAMI-Hashing-Tool-1.2.0-macos-intel.zip
+dca481af72b00aa933fe21cec1b6def45387aadc7a121749aefc7943f1f4712d  GAMI-Hashing-Tool-1.2.0-macos.zip
+7f368d94f57491af79a04fd0ab211e71fc735fcdd0fe4edf09fcfacce51f18d7  GAMI-Hashing-Tool-1.2.0-linux.tar.gz
+2331a88a7afd5211a59793432d1adf93e610abaeb060840b54994ee5ea1096f3  GAMI-Hashing-Tool-1.2.0-linux-arm64.tar.gz</div>
+        <p>Builds are reproducible: the same source produces a bit-identical
+        file on any machine. Instructions are in
+        <a href="https://github.com/PJET2000/gami-hash/blob/main/VERIFY.md">VERIFY.md</a>.
+        For institutions with their own IT there is also a one-page
+        <a href="https://github.com/PJET2000/gami-hash/blob/main/reference/Get-FileHashes.ps1">PowerShell script</a>
+        that produces the same result format without this program.</p>
+      </div>
+    </details>
+  </section>
+
+  <footer>
+    <div>GAMI · Authentic Memory</div>
+    <div><a href="mailto:kontakt@authenticmemory.org">Questions? We are happy to help.</a></div>
+  </footer>
+</div>
+
+<script>
+  // Point the primary button at the visitor's platform; keep the rest as links.
+  (function () {
+    var ua = navigator.userAgent;
+    var base = "https://github.com/PJET2000/gami-hash/releases/download/v1.2.0/GAMI-Hashing-Tool-1.2.0";
+    var btn = document.getElementById("dl-btn");
+    var label = document.getElementById("dl-label");
+    if (/Macintosh|Mac OS X/.test(ua)) {
+      // Apple Silicon vs. Intel is not reliably detectable from the browser;
+      // Apple Silicon has been standard since 2020, and Rosetta covers the rest.
+      btn.href = base + "-macos.zip";
+      label.textContent = "Download for macOS";
+    } else if (/Linux/.test(ua) && !/Android/.test(ua)) {
+      btn.href = base + "-linux.tar.gz";
+      label.textContent = "Download for Linux";
+    } else if (/ARM64|aarch64/i.test(ua)) {
+      btn.href = base + "-windows-arm64.exe";
+    }
+  })();
+</script>
+</body>
+</html>
